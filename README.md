@@ -1,29 +1,54 @@
-<!-- <h1 align="center"> Xiaomi Robotics-0</h1> -->
 <div align="center">
-  <img src="assets/logo.png" width="80%">
 
-  <table align="center">
-    <tr>
-        <td align="center"><strong>📄 Paper</strong></td>
-        <td align="center"><strong>🌐 Project Page</strong></td>
-        <td align="center"><strong>🤗 Hugging Face</strong></td>
-    </tr>
-    <tr>
-        <td align="center"><a href="https://xiaomi-robotics-0.github.io/assets/paper.pdf">Read the Paper</a></td>
-        <td align="center"><a href="https://xiaomi-robotics-0.github.io/">Explore the Project</a></td>
-        <td align="center"><a href="https://huggingface.co/collections/XiaomiRobotics/xiaomi-robotics-0">Access Models</a></td>
-    </tr>
-  </table>
+  # Xiaomi-Robotics-0
+
+  **An Open-Sourced Vision-Language-Action Model with Real-Time Inference**
+
+  [![Paper](https://img.shields.io/badge/📄-Paper-red)](https://xiaomi-robotics-0.github.io/assets/paper.pdf)
+  [![Project Page](https://img.shields.io/badge/🌐-Project_Page-blue)](https://xiaomi-robotics-0.github.io/)
+  [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97-Hugging%20Face-yellow)](https://huggingface.co/collections/XiaomiRobotics/xiaomi-robotics-0)
+  [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
+
 </div>
 
+---
 
-## Open-Sourced Vision-Language-Action Model with Real-Time Inference
-We introduce **Xiaomi-Robotics-0**, an open-source Vision-Language-Action (VLA) model comprising 4.7B parameters, optimized for high-performance reasoning and smooth real-time execution. The **Xiaomi-Robotics-0** model synergizes a pre-trained VLM for robust perception with a diffusion transformer for action generation via flow-matching. Utilizing a carefully designed multi-stage training recipe—spanning large-scale cross-embodiment pre-training to asynchronous post-training—it delivers versatile action capabilities while maintaining the underlying VLM's vision-language strengths.
+## 💡 About Xiaomi-Robotics-0
+
+**Xiaomi-Robotics-0** is a state-of-the-art **Vision-Language-Action (VLA) model** with 4.7B parameters, specifically engineered for high-performance robotic reasoning and seamless real-time execution. 
+
+### Key Features:
+
+* **🧠 Strong Generalization**: Pre-trained on diverse cross-embodiment trajectories and VL data to handle complex, unseen tasks.
+* **🚀 Real-Time Ready**: Optimized with asynchronous execution to minimize inference latency.
+* **🛠️ Flexible Deployment**: Fully compatible with the Hugging Face `transformers` ecosystem and optimized for consumer GPUs.
 
 
-## 📅 Update
-- [Feb 2026] We released the arXiv paper.
-- [Feb 2026] We released the [pre-trained weights](https://huggingface.co/collections/XiaomiRobotics/xiaomi-robotics-0) of Xiaomi-Robotics-0, along with the [fine-tuned weights](https://huggingface.co/collections/XiaomiRobotics/xiaomi-robotics-0) and inference code for LIBERO, CALVIN, and SimplerEnv.
+
+## 📅 Updates
+
+- **[Feb 2026]** 🎉 Released the **Technical Report**.
+- **[Feb 2026]** 🔥 Released **Pre-trained weights** and **Fine-tuned weights** for LIBERO, CALVIN, and SimplerEnv.
+- **[Feb 2026]** 💻 Inference code and evaluation scripts are now live!
+
+---
+
+
+## 🏆 Benchmark
+
+We evaluate **Xiaomi-Robotics-0** on three standard simulation benchmarks: **CALVIN**, **LIBERO**, and **SimplerEnv**. The table below summarizes the performance results across different embodiments and datasets. For each setting, we provide the corresponding fine-tuned checkpoint and a guide for running the evaluation.
+
+
+|                | 🤗 Name on Hugging Face                                       | Description                       | Performance                        | Evaluation Guide                             |
+| :------------- | :----------------------------------------------------------- | :-------------------------------- | :--------------------------------- | :------------------------------------------- |
+| **LIBERO**     | [**Xiaomi-Robotics-0-LIBERO**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-LIBERO) | Fine-tuned on four LIBERO suites. | **98.7%** (Avg Success)            | [LIBERO Eval](eval_libero/README.md)         |
+| **CALVIN**     | [**Xiaomi-Robotics-0-Calvin-ABCD_D**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-Calvin-ABCD_D) | Fine-tuned on ABCD→D Split.       | **4.80** (Avg Length)              | [CALVIN Eval](eval_calvin/README.md)         |
+|                | [**Xiaomi-Robotics-0-Calvin-ABC_D**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-Calvin-ABC_D) | Fine-tuned on ABC→D Split.        | **4.75** (Avg Length)              | [CALVIN Eval](eval_calvin/README.md)         |
+| **SimplerEnv** | [**Xiaomi-Robotics-0-SimplerEnv-Google-Robot**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-SimplerEnv-Google-Robot) | Fine-tuned on Fractal dataset.    | **85.5%** (VM) <br> **74.7%** (VA) | [SimplerEnv Eval](eval_simplerenv/README.md) |
+|                | [**Xiaomi-Robotics-0-SimplerEnv-WidowX**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-SimplerEnv-WidowX) | Fine-tuned on Bridge dataset.     | **79.2%**                          | [SimplerEnv Eval](eval_simplerenv/README.md) |
+| **Base**       | [**Xiaomi-Robotics-0**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0) | Pre-trained model.                | -                                  | -                                            |
+
+
 
 
 ## 🚀 Quick Start: Installation & Deployment
@@ -31,7 +56,9 @@ We introduce **Xiaomi-Robotics-0**, an open-source Vision-Language-Action (VLA) 
 Our project relies primarily on HuggingFace Transformers 🤗, making deployment extremely easy. If your environment supports transformers >= 4.57.1, you can use our project seamlessly—we recommend PyTorch 2.8.0 (paired with torchvision 0.23.0 and torchaudio 2.8.0), as this combination has been fully tested by our team and ensures optimal compatibility. 
 
 ### 1️⃣ Installation Guides
+
 Here’s a simple installation guide to get you started:
+
 ```bash
 git clone https://github.com/XiaomiRobotics/Xiaomi-Robotics-0 
 cd Xiaomi-Robotics-0
@@ -108,27 +135,21 @@ print(f"Generated Action Chunk Shape: {action_chunk.shape}")
 ```
 
 
-## 🏆 Benchmark
-
-We evaluate **Xiaomi-Robotics-0** on three standard simulation benchmarks: **CALVIN**, **LIBERO**, and **SimplerEnv**. The table below summarizes the performance results across different embodiments and datasets. For each setting, we provide the corresponding fine-tuned checkpoint and a guide for running the evaluation.
-
-|  | 🤗 Hugging Face | Description | Performance | Evaluation Guide |
-| :--- | :--- | :--- | :--- | :--- |
-| **LIBERO** | [**Xiaomi-Robotics-0-LIBERO**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-LIBERO) | Fine-tuned on four LIBERO suites. | **98.7%** (Avg Success) | [LIBERO Eval](eval_libero/README.md) |
-| **CALVIN** | [**Xiaomi-Robotics-0-Calvin-ABCD_D**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-Calvin-ABCD_D) | Fine-tuned on ABCD→D Split. | **4.80** (Avg Length) | [CALVIN Eval](eval_calvin/README.md) |
-| | [**Xiaomi-Robotics-0-Calvin-ABC_D**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-Calvin-ABC_D) | Fine-tuned on ABC→D Split. | **4.75** (Avg Length) | [CALVIN Eval](eval_calvin/README.md) |
-| **SimplerEnv** | [**Xiaomi-Robotics-0-SimplerEnv-Google-Robot**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-SimplerEnv-Google-Robot) | Fine-tuned on Fractal dataset. | **85.5%** (VM) <br> **74.7%** (VA) | [SimplerEnv Eval](eval_simplerenv/README.md) |
-| | [**Xiaomi-Robotics-0-SimplerEnv-WidowX**](https://huggingface.co/XiaomiRobotics/Xiaomi-Robotics-0-SimplerEnv-WidowX) | Fine-tuned on Bridge dataset. | **79.2%** | [SimplerEnv Eval](eval_simplerenv/README.md) |
-
 
 ## 📚 Citation
 
 If you find this project useful, please consider citing:
+
 ```bibtex
-@article{robotics2026xiaomi,
+@misc{robotics2026xiaomi,
   title        = {Xiaomi-Robotics-0: An Open-Sourced Vision-Language-Action Model with Real-Time Execution},
   author       = {Xiaomi Robotics},
-  journal      = {arXiv preprint},
-  year         = {2026}
+  howpublished={\url{https://xiaomi-robotics-0.github.io}},
+  year         = {2026},
+  note={Project Website}
 }
 ```
+
+## 📄 License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
