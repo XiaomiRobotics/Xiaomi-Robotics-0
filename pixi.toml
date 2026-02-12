@@ -1,0 +1,21 @@
+[workspace]
+name = "mibot"
+version = "0"
+description = "Environment for Xiaomi-Robotics-0"
+channels = ["conda-forge", "nvidia"]
+platforms = ["linux-64"]
+
+[dependencies]
+python = "3.12.*"
+pytorch = "=2.8.0"
+pytorch-gpu = { build = "*cuda12*" }
+torchvision = "=0.23.0"
+torchaudio = "=2.8.0"
+transformers = "=4.57.1"
+flash-attn = "=2.8.3"
+libegl = "*"
+libgl = "*"
+libgles = "*"
+
+[system-requirements]
+cuda = '12'

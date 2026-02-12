@@ -63,20 +63,13 @@ Here’s a simple installation guide to get you started:
 git clone https://github.com/XiaomiRobotics/Xiaomi-Robotics-0 
 cd Xiaomi-Robotics-0
 
-# Create a Conda environment with Python 3.12
-conda create -n mibot python=3.12 -y
-conda activate mibot
+# install a conda env manager pixi from
+# https://pixi.prefix.dev/latest/installation/
+curl -fsSL https://pixi.sh/install.sh | sh
 
-# Install PyTorch
-pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cu128
-# Install transformers
-pip install transformers==4.57.1
-# Install flash-attn
-pip uninstall -y ninja && pip install ninja
-pip install flash-attn==2.8.3 --no-build-isolation
-# or pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.8cxx11abiTRUE-cp312-cp312-linux_x86_64.whl
+pixi install
 
-sudo apt-get install -y libegl1 libgl1 libgles2
+pixi shell
 ```
 
 
