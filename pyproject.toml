@@ -1,0 +1,36 @@
+[project]
+name = "xiaomi-robotics-0"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "flash-attn==2.8.3",
+    "torch==2.8.0",
+    "torchaudio==2.8.0",
+    "torchvision==0.23.0",
+    "transformers==4.57.1",
+    "triton==3.4.0",
+]
+
+[tool.uv]
+no-build-isolation-package = ["flash-attn"]
+
+[tool.uv.sources]
+torch = { 
+    url =  "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/torch-2.8.0%2Brocm7.2.0.lw.gitbf943426-cp312-cp312-linux_x86_64.whl" 
+}
+torchaudio = {
+    url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/torchaudio-2.8.0%2Brocm7.2.0.git6e1c7fe9-cp312-cp312-linux_x86_64.whl"
+}
+torchvision = {
+    url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/torchvision-0.23.0%2Brocm7.2.0.git824e8c87-cp312-cp312-linux_x86_64.whl"
+}
+triton = {
+    url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/triton-3.4.0%2Brocm7.2.0.git0cace8d2-cp312-cp312-linux_x86_64.whl"
+}
+[[tool.uv.index]]
+name = "pytorch-rocm"
+url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2/"
+explicit = false
+
