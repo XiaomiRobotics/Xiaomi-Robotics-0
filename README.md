@@ -74,7 +74,7 @@ cd Xiaomi-Robotics-0
 conda create -n mibot python=3.12 -y
 conda activate mibot
 
-# Install PyTorch
+# Install PyTorch (NVIDIA CUDA)
 pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cu128
 # Install transformers
 pip install transformers==4.57.1
@@ -84,6 +84,15 @@ pip install flash-attn==2.8.3 --no-build-isolation
 # or pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.8cxx11abiTRUE-cp312-cp312-linux_x86_64.whl
 
 sudo apt-get install -y libegl1 libgl1 libgles2
+```
+
+> 💡 **Intel GPU (XPU) users:** Use PyTorch with native XPU support instead of the CUDA wheels above. `flash-attn` is not required — the model will use PyTorch's built-in `scaled_dot_product_attention` (`sdpa`) automatically.
+
+```bash
+# Install PyTorch with Intel XPU support
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/xpu
+# Install transformers
+pip install transformers==4.57.1
 ```
 
 
@@ -96,14 +105,21 @@ sudo apt-get install -y libegl1 libgl1 libgles2
 import torch
 from transformers import AutoModel, AutoProcessor
 
-# 1. Load model and processor 
+# Set device: 'cuda' for NVIDIA GPU, 'xpu' for Intel GPU
+device = "cuda"  # change to 'xpu' for Intel GPU
+
+# flash_attention_2 for CUDA (requires flash-attn package)
+# sdpa uses PyTorch's built-in scaled_dot_product_attention — works on XPU and CUDA
+attn_impl = "flash_attention_2" if device == "cuda" else "sdpa"
+
+# 1. Load model and processor
 model_path = "XiaomiRobotics/Xiaomi-Robotics-0-LIBERO"
 model = AutoModel.from_pretrained(
-    model_path, 
-    trust_remote_code=True, 
-    attn_implementation="flash_attention_2", 
-    dtype=torch.bfloat16
-).cuda().eval()
+    model_path,
+    trust_remote_code=True,
+    attn_implementation=attn_impl,
+    dtype=torch.bfloat16,
+).to(device).eval()
 processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True, use_fast=False)
 
 
@@ -129,14 +145,14 @@ inputs = processor(
 
 # Add proprioceptive state and action mask
 robot_type = "libero_all"
-inputs["seed"] = 42 
+inputs["seed"] = 42
 inputs["state"] = torch.from_numpy(proprio_state).to(model.device, model.dtype).view(1, 1, -1)
 inputs["action_mask"] = processor.get_action_mask(robot_type).to(model.device, model.dtype)
 
-# 4. Generate action 
+# 4. Generate action
 with torch.no_grad():
     outputs = model(**inputs)
-    
+
 # Decode raw outputs into actionable control commands
 action_chunk = processor.decode_action(outputs.actions, robot_type=robot_type)
 print(f"Generated Action Chunk Shape: {action_chunk.shape}")
