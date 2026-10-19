@@ -15,6 +15,7 @@ from transformers.models.qwen3_vl.modeling_qwen3_vl import Qwen3VLTextRotaryEmbe
 
 from mibot.models import MIMODEL
 from mibot.models.VLM.qwen3vl import Qwen3VLForConditionalGeneration
+from mibot.utils.device import resolve_attn_implementation
 from mibot.utils.model_utils import auto_cast
 
 
@@ -416,8 +417,11 @@ class XR0(nn.Module):
         enable_freq: bool = False,
         prefix_mask_prob: float = 0.5,
         async_train: bool = False,
+        attn_implementation: Optional[str] = None,
     ):
         super().__init__()
+        # None picks flash_attention_2 on CUDA when flash_attn is installed, otherwise sdpa.
+        self.attn_implementation = resolve_attn_implementation(requested=attn_implementation)
         self.state_shape = state_shape
         self.action_shape = action_shape
         self.dit_num_layers = dit_num_layers
@@ -440,7 +444,7 @@ class XR0(nn.Module):
         """Instantiate all sub-modules: VLM backbone, DiT head, projectors, and embeddings."""
         # VLM backbone
         self.vlm = Qwen3VLForConditionalGeneration.from_pretrained(
-            "Qwen/Qwen3-VL-4B-Instruct", attn_implementation="flash_attention_2", dtype=torch.bfloat16
+            "Qwen/Qwen3-VL-4B-Instruct", attn_implementation=self.attn_implementation, dtype=torch.bfloat16
         ).train()
         self.vlm.model.get_input_embeddings().requires_grad_(False)
         self.vlm.model.visual.gradient_checkpointing_enable()

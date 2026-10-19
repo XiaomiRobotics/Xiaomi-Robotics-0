@@ -14,16 +14,25 @@ mp.set_start_method("spawn", force=True)
 from tqdm import tqdm
 from transformers import AutoModel, AutoProcessor
 
+from device import checkpoint_attn_argument, resolve_attn_implementation, resolve_device
+
 
 class Server(mp.Process):
-    def __init__(self, model_path, host, port, seed=42):
+    def __init__(self, model_path, host, port, seed=42, device=None, attn_implementation=None):
         super(Server, self).__init__()
         self.host = host
         self.port = port
 
-        # build model
-        self.model = AutoModel.from_pretrained(model_path, trust_remote_code=True, attn_implementation="flash_attention_2", dtype=torch.bfloat16).cuda().to(torch.bfloat16)
-        self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True, use_fast=False)
+        self.model_path = model_path
+        self.device = device
+        self.attn_implementation = attn_implementation
+
+    def _build_model(self):
+        # Built inside the spawned process: an XPU tensor cannot be pickled to a child process.
+        device = resolve_device(self.device)
+        attn_implementation = resolve_attn_implementation(device, self.attn_implementation)
+        self.model = AutoModel.from_pretrained(self.model_path, trust_remote_code=True, attn_implementation=checkpoint_attn_argument(attn_implementation), dtype=torch.bfloat16).to(device).to(torch.bfloat16)
+        self.processor = AutoProcessor.from_pretrained(self.model_path, trust_remote_code=True, use_fast=False)
 
     def _recv_all(self, conn, length):
         data = b""
@@ -35,6 +44,7 @@ class Server(mp.Process):
         return data
 
     def run(self):
+        self._build_model()
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
             server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             server_socket.bind((self.host, self.port))
@@ -127,6 +137,18 @@ def parse_args():
         type=int,
         default=10086,
     )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default=None,
+        help="Device to run on, for example xpu, xpu:0, cuda:0 or cpu. Defaults to xpu, then cuda, then cpu.",
+    )
+    parser.add_argument(
+        "--attn-implementation",
+        type=str,
+        default=None,
+        help="Attention implementation. Defaults to flash_attention_2 on CUDA when flash_attn is installed, otherwise sdpa.",
+    )
     return parser.parse_args()
 
 
@@ -134,7 +156,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     try:
-        server = Server(model_path=args.model, host=args.host, port=args.port)
+        server = Server(model_path=args.model, host=args.host, port=args.port, device=args.device, attn_implementation=args.attn_implementation)
         print(f"Starting server on {args.host}:{args.port}")
         server.start()
         server.join()

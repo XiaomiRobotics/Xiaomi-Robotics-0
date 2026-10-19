@@ -59,13 +59,13 @@ for ((i=0; i<NUM_PORTS; i++)); do
         WINDOW_NAME="server-$(printf "%02d" $i)"
         tmux rename-window -t $SESSION_NAME:0 $WINDOW_NAME
         setup_environment "$SESSION_NAME:$WINDOW_NAME"
-        tmux send-keys -t $SESSION_NAME:$WINDOW_NAME "CUDA_VISIBLE_DEVICES=$GPU_ID python3 mibot/server/deploy.py --model '$MODEL_PATH' --port $PORT" Enter
+        tmux send-keys -t $SESSION_NAME:$WINDOW_NAME "CUDA_VISIBLE_DEVICES=$GPU_ID ZE_AFFINITY_MASK=$GPU_ID python3 mibot/server/deploy.py --model '$MODEL_PATH' --port $PORT" Enter
     else
         # Create new windows for additional servers
         WINDOW_NAME="server-$(printf "%02d" $i)"
         tmux new-window -d -t $SESSION_NAME -n $WINDOW_NAME
         setup_environment "$SESSION_NAME:$WINDOW_NAME"
-        tmux send-keys -t $SESSION_NAME:$WINDOW_NAME "CUDA_VISIBLE_DEVICES=$GPU_ID python3 mibot/server/deploy.py --model '$MODEL_PATH' --port $PORT" Enter
+        tmux send-keys -t $SESSION_NAME:$WINDOW_NAME "CUDA_VISIBLE_DEVICES=$GPU_ID ZE_AFFINITY_MASK=$GPU_ID python3 mibot/server/deploy.py --model '$MODEL_PATH' --port $PORT" Enter
     fi
 done
 

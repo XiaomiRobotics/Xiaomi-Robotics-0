@@ -142,6 +142,24 @@ action_chunk = processor.decode_action(outputs.actions, robot_type=robot_type)
 print(f"Generated Action Chunk Shape: {action_chunk.shape}")
 ```
 
+### How to run the same on Intel's XPU
+
+Skip the CUDA PyTorch wheel and the `flash-attn` install from step 1, and install the XPU wheel instead:
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/xpu
+pip install transformers==4.57.1
+```
+
+The servers pick XPU, then CUDA, then CPU by default, so the same commands work with `--device xpu` (or `xpu:1`, or `ZE_AFFINITY_MASK=1` to expose one card):
+
+```bash
+python deploy/server.py --model XiaomiRobotics/Xiaomi-Robotics-0-LIBERO --device xpu
+python deploy/check_parity.py --model XiaomiRobotics/Xiaomi-Robotics-0-LIBERO --device xpu   # CPU versus XPU on the same observation
+```
+
+In the Python example above, replace `.cuda()` with `.to("xpu")` and use `attn_implementation={"": "eager", "vlm_config": "sdpa"}`. The released checkpoint does not declare SDPA for its top level class, and only the Qwen3-VL backbone reads the setting. Flash Attention 2 and DeepSpeed training stay CUDA only. The post-training server takes the same flag: `python mibot/server/deploy.py --model /path/to/checkpoint --device xpu`.
+
 ## 🛠️ Post-Training
 
 Besides inference and evaluation, we also open-source the post-training pipeline for adapting **Xiaomi-Robotics-0** on real robots. The post-training codebase and sample data are available in [`xr0/`](xr0/). For detailed instructions on installation, data preparation, training, and deployment, please refer to [`xr0/README.md`](xr0/README.md).

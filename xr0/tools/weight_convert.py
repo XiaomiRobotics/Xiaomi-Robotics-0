@@ -12,6 +12,8 @@ import traceback
 from pathlib import Path
 from transformers import AutoModel, AutoProcessor
 
+from mibot.utils.device import checkpoint_attn_argument, resolve_attn_implementation
+
 def load_and_convert_model(model_path, output_dir, output_filename="pytorch_model.pt"):
     """Load model using transformers and save in PyTorch format."""
 
@@ -21,8 +23,8 @@ def load_and_convert_model(model_path, output_dir, output_filename="pytorch_mode
     print(f"\nModel path: {model_path}")
 
     # Load model the same way as server.py does
-    print("\nLoading model (using AutoModel with flash_attention_2)...")
-    model = AutoModel.from_pretrained(model_path, trust_remote_code=True, attn_implementation="flash_attention_2", dtype=torch.bfloat16)
+    print("\nLoading model (using AutoModel)...")
+    model = AutoModel.from_pretrained(model_path, trust_remote_code=True, attn_implementation=checkpoint_attn_argument(resolve_attn_implementation("cpu")), dtype=torch.bfloat16)
 
     # Move to CPU for saving (model is on GPU by default in server.py)
     print("Moving model to CPU for saving...")

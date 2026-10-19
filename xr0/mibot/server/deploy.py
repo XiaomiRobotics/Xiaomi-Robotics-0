@@ -11,6 +11,7 @@ from mmengine import Config
 
 from mibot.models import MIMODEL
 from mibot.server.runtime.server import Server
+from mibot.utils.device import resolve_device
 from mibot.utils.io import build_action_mask, validate_stats
 
 mp.set_start_method("spawn", force=True)
@@ -44,20 +45,22 @@ def parse_args():
     parser.add_argument("--model", type=str, required=True, help="Path to the model dir.")
     parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=10086)
+    parser.add_argument("--device", type=str, default=None, help="For example xpu, xpu:0, cuda:0 or cpu. Defaults to xpu, then cuda, then cpu.")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    device = "cuda:0"
+    device = str(resolve_device(args.device))
     cfg, model = load_model(args.model, device)
     mean, std, action_mask = load_stats(cfg, device)
 
     try:
         server = Server(args.host, args.port, model, mean, std, action_mask, device)
         print(f"Starting server on {args.host}:{args.port}")
-        server.start()
-        server.join()
+        # Run in this process: the model already sits on the device, and a device tensor
+        # that is not a CUDA tensor (for example XPU) cannot be pickled to a spawned child.
+        server.run()
     except OSError as error:
         if error.errno == 98:
             print(f"Error: Port {args.port} is already in use. Please choose a different port.")
